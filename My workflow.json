@@ -1,0 +1,382 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Invoices ",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Upload invoices ",
+              "fieldType": "file",
+              "acceptFileTypes": ".pdf",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false,
+          "customCss": ":root {\n    /* الخطوط - استخدام نظام خطوط النظام لتحسين الأداء والرسمية */\n    --font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;\n    --font-weight-normal: 400;\n    --font-weight-medium: 500;\n    --font-weight-bold: 600;\n    \n    /* أحجام النصوص - تم تعديلها لتكون أكثر تناسقاً */\n    --font-size-body: 14px;\n    --font-size-label: 13px;\n    --font-size-header: 24px;\n    --font-size-subheader: 15px;\n    --font-size-input: 15px;\n    --font-size-html-h1: 32px;\n    \n    /* لوحة الألوان الاحترافية (Modern Corporate Palette) */\n    --color-background: #f8fafc; /* رمادي فاتح جداً مريح للعين */\n    --color-card-bg: #ffffff;\n    --color-card-border: #e2e8f0;\n    --color-card-shadow: rgba(0, 0, 0, 0.04);\n    \n    --color-primary: #2563eb; /* أزرق رسمي احترافي */\n    --color-primary-hover: #1d4ed8;\n    \n    --color-header: #1e293b; /* كحلي غامق للنصوص الأساسية */\n    --color-label: #475569;\n    --color-input-text: #1e293b;\n    --color-input-border: #cbd5e1;\n    --color-focus-border: #3b82f6;\n    \n    --color-submit-btn-bg: var(--color-primary);\n    --color-submit-btn-text: #ffffff;\n    \n    --color-error: #dc2626;\n    --color-test-notice-bg: #eff6ff;\n    --color-test-notice-text: #1e40af;\n    --color-test-notice-border: #bfdbfe;\n\n    /* الحواف والتباعد - لمسة عصرية ناعمة */\n    --border-radius-card: 12px;\n    --border-radius-input: 8px;\n    --padding-card: 32px;\n    --container-width: 480px; /* توسيع بسيط لراحة بصرية أكبر */\n    \n    /* الظلال */\n    --box-shadow-card: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);\n}\n\n/* تحسينات إضافية للمظهر العام */\nform {\n    max-width: var(--container-width);\n    margin: 40px auto;\n    background: var(--color-card-bg);\n    padding: var(--padding-card);\n    border-radius: var(--border-radius-card);\n    border: 1px solid var(--color-card-border);\n    box-shadow: var(--box-shadow-card);\n}\n\ninput[type=\"text\"], \ninput[type=\"email\"], \ninput[type=\"number\"], \ntextarea, \nselect {\n    transition: all 0.2s ease-in-out;\n    border: 1px solid var(--color-input-border);\n    padding: 12px 16px;\n    font-weight: var(--font-weight-normal);\n}\n\ninput:focus {\n    outline: none;\n    border-color: var(--color-focus-border);\n    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);\n}\n\nbutton[type=\"submit\"] {\n    font-weight: var(--font-weight-medium);\n    letter-spacing: 0.5px;\n    text-transform: uppercase;\n    transition: background 0.3s ease;\n    cursor: pointer;\n    border: none;\n    border-radius: var(--border-radius-input);\n}\n\nbutton[type=\"submit\"]:hover {\n    background: var(--color-primary-hover);\n}"
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -544,
+        -16
+      ],
+      "id": "a1315e32-4756-4c1d-bb21-158f2478c6d0",
+      "name": "On form submission",
+      "webhookId": "4303bf7b-e927-4242-b2d0-387e882801ce"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "Upload_invoices_",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -320,
+        -16
+      ],
+      "id": "2e9d5415-a3bd-4e93-af92-84eaf8ffe6e4",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "=# RoleYou are an expert Assistant specialized in extracting structured data from an pdf invoices.\n\n# Goalyour goal is to accuratly extract specific information from the provided invoice and format it as a single JSON object.\n\n# Instructioins\n1- analyze the provided invoice text. \n2- identify and extract the exact values for the follwing feilds:   \n* 'invoice_date': that indicates the date (in both arabic and english)  \n* 'Provider_Name': the formal name of the provider.   \n* 'Invoice_amount': the total amount of the invoice  \n* 'Currency': the total amount currancy (JOD, SAR, $)  \n* 'Items_Suammary': a breif summary of what this purshus included.\n3- Your output MUST be only the JSON object containing the extracted data. \nDo not include any other textm explanations, or markdown formating in your response. \n\n# Today's Date and Time is {{ $now }}# Example output{  'invoice_date': \"15/10/2025\"  'Provider_Name': \"Zain Jordan\"  'Invoice_amount': 4820  'Currency' : 'JOD'  'Items_Suammary': \"Yearly internet subscription, and Company SIM cards\"}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -96,
+        -16
+      ],
+      "id": "cf1571a9-45a6-4c38-9bbf-2b90fafc60c3",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-2.0-flash-001",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -24,
+        208
+      ],
+      "id": "58cd3b75-1879-4d21-95cc-98d0f9dba4cf",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "GvzQ4dlFSnGEJYCc",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.output }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "invoice_date",
+              "type": "date",
+              "description": "={{ $fromAI('invoice_date')  }}"
+            },
+            {
+              "name": "Provider_Name",
+              "description": "={{ $fromAI('Provider_Name')  }}"
+            },
+            {
+              "name": "Invoice_amount",
+              "type": "number",
+              "description": "={{ $fromAI('Invoice_amount')  }}"
+            },
+            {
+              "name": "Currency",
+              "description": "={{ $fromAI('Currency')  }}"
+            },
+            {
+              "name": "Items_Suammary",
+              "description": "={{ $fromAI('Items_Suammary')  }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        256,
+        -16
+      ],
+      "id": "1f211222-053e-4f3b-8919-c961cc6d4bc3",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "d2mbDgt4RV6XjTau",
+          "mode": "list",
+          "cachedResultName": "PDF_INVOICES",
+          "cachedResultUrl": "/projects/LCX5KCYTqoEhdtqp/datatables/d2mbDgt4RV6XjTau"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "invoice_date": "={{ $json.output.invoice_date }}",
+            "Provider_Name": "={{ $json.output.Provider_Name }}",
+            "Currency": "={{ $json.output.Currency }}",
+            "Items_Suammary": "={{ $json.output.Items_Suammary }}",
+            "Invoice_amount": "={{ $json.output.Invoice_amount }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "invoice_date",
+              "displayName": "invoice_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Provider_Name",
+              "displayName": "Provider_Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Invoice_amount",
+              "displayName": "Invoice_amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Currency",
+              "displayName": "Currency",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Items_Suammary",
+              "displayName": "Items_Suammary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        608,
+        -16
+      ],
+      "id": "ebc9ba60-c92d-4c11-9773-4f4444c4a845",
+      "name": "Insert row"
+    }
+  ],
+  "pinData": {
+    "On form submission": [
+      {
+        "json": {
+          "Upload invoices ": [
+            {
+              "filename": "فاتورة 1.pdf",
+              "mimetype": "application/pdf",
+              "size": 119314
+            }
+          ],
+          "submittedAt": "2026-05-05T18:01:50.832+03:00",
+          "formMode": "test"
+        },
+        "binary": {
+          "Upload_invoices_": {
+            "mimeType": "application/pdf",
+            "fileType": "pdf",
+            "fileExtension": "pdf",
+            "data": "filesystem-v2",
+            "fileName": "فاتورة 1.pdf",
+            "id": "filesystem-v2:workflows/yY4zTwQHqNsguaTq/executions/temp/binary_data/2b6df644-c4ca-41d5-aa38-95fa33bd5cf6",
+            "fileSize": "119 kB",
+            "bytes": 119314
+          }
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Extract from File": [
+      {
+        "json": {
+          "numpages": 2,
+          "numrender": 2,
+          "info": {
+            "PDFFormatVersion": "1.7",
+            "Language": "en-US",
+            "EncryptFilterName": null,
+            "IsLinearized": false,
+            "IsAcroFormPresent": false,
+            "IsXFAPresent": false,
+            "IsCollectionPresent": false,
+            "IsSignaturesPresent": false,
+            "Author": "Mohammed Huria",
+            "Creator": "Microsoft® Word 2019",
+            "CreationDate": "D:20251021004538+03'00'",
+            "ModDate": "D:20251021004538+03'00'",
+            "Producer": "Microsoft® Word 2019"
+          },
+          "metadata": {
+            "pdf:producer": "Microsoft® Word 2019",
+            "dc:creator": [
+              "Mohammed Huria"
+            ],
+            "xmp:creatortool": "Microsoft® Word 2019",
+            "xmp:createdate": "2025-10-21T00:45:38+03:00",
+            "xmp:modifydate": "2025-10-21T00:45:38+03:00",
+            "xmpmm:documentid": "uuid:A0D81ECD-D007-4A38-8DF7-2996A6625DC6",
+            "xmpmm:instanceid": "uuid:A0D81ECD-D007-4A38-8DF7-2996A6625DC6"
+          },
+          "text": "فاتورة ضريبية مبسطة\nINVOICE\n[LOGO:شعار شركة \"ابتكار الحلول\"]\nابتكار الحلول لتقنية المعلومات\nبرج المملكة، الطابق25، الرياض،11221\nالرقم الضريبي:310012345678903\n----------------------------------------------------------------------\nالعميل:\nشركة البناء الحديثة للمقاوالت\nشارع األمير محمد بن عبدالعزيز، جدة\n----------------------------------------------------------------------\nرقم الفاتورة: INV-2025-789\nتاريخ اإلصدار:2025/10/21\nتاريخ االستحقاق:2025/11/20\n|| الكمية | سعر الوحدة | اإلجمالي (قبل الضريبة) الوصف|\n| :----------------------------------------- | :----: | :---------: | :--------------------: |\n|اشتراك سنوي-نظام إدارة المشاريع(Cloud) | 1 | 12,000.00 | 12,000.00 |\n|| ساعات دعم فني إضافية10|350.00|3,500.00|\n|ترخيص استخدام إضافة| \"التقارير المتقدمة\"5|800.00|4,000.00|\n-----------------------------\nالمجموع الفرعي:19,500.00لاير\nضريبة القيمة المضافة (15:)%2,925.00لاير\n-----------------------------\n\nإجمالي الفاتورة:22,425.00لاير\n-----------------------------\n**معلومات الدفع:**\nبنك الراجحي\nاسم الحساب: ابتكار الحلول لتقنية المعلومات\nرقم الحساب:30012749678",
+          "version": "5.3.31"
+        },
+        "binary": {},
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "AI Agent": [
+      {
+        "json": {
+          "output": "```json\n{\n  \"invoice_date\": \"2025/10/21\",\n  \"Provider_Name\": \"ابتكار الحلول لتقنية المعلومات\",\n  \"Invoice_amount\": \"22,425.00\",\n  \"Currency\": \"لاير\",\n  \"Items_Suammary\": \"اشتراك سنوي-نظام إدارة المشاريع(Cloud), ساعات دعم فني إضافية, ترخيص استخدام إضافة \\\"التقارير المتقدمة\\\"\"\n}\n```"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Information Extractor": [
+      {
+        "json": {
+          "output": {
+            "invoice_date": "2025-10-21",
+            "Provider_Name": "ابتكار الحلول لتقنية المعلومات",
+            "Invoice_amount": 22425,
+            "Currency": "لاير",
+            "Items_Suammary": "اشتراك سنوي-نظام إدارة المشاريع(Cloud), ساعات دعم فني إضافية, ترخيص استخدام إضافة \"التقارير المتقدمة\""
+          }
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "021e119a-377c-475b-ae68-7422daae31c4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3933e8c6e5d86c4fd7dc2f7857b106018cdd1f4bb202742a2cf3724456d83953"
+  },
+  "id": "yY4zTwQHqNsguaTq",
+  "tags": []
+}
